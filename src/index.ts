@@ -2,6 +2,7 @@ import express from "express";
 import { createServer } from "http";
 import path from "path";
 import { Server } from "socket.io";
+import { Location } from "./types";
 
 const main = () => {
   const app = express();
@@ -18,6 +19,12 @@ const main = () => {
 
     socket.on("sendMessage", (message) => {
       io.emit("message", message);
+    });
+
+    socket.on("sendLocation", (location: Location) => {
+      const { longitude, latitude } = location;
+
+      io.emit("message", `https://google.com/maps?q=${longitude},${latitude}`);
     });
 
     socket.on("disconnect", () => {
