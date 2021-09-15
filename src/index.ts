@@ -10,8 +10,14 @@ const main = () => {
 
   app.use(express.static(path.join(__dirname, "../public")));
 
-  io.on("connection", () => {
+  io.on("connection", (socket) => {
     console.log("new web socket connection");
+
+    socket.emit("message", "Welcome!");
+
+    socket.on("sendMessage", (message) => {
+      io.emit("message", message);
+    });
   });
 
   const port = process.env.PORT || 3000;
