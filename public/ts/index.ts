@@ -13,7 +13,12 @@ const main = () => {
 
       const message = (e.target as any).elements.message.value;
 
-      socket.emit("sendMessage", message);
+      socket.emit("sendMessage", message, (error: string | undefined) => {
+        if (error) {
+          return console.log(error);
+        }
+        console.log("the message was delivered");
+      });
     });
 
     document.querySelector("#send-location")?.addEventListener("click", () => {
@@ -23,10 +28,16 @@ const main = () => {
 
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
-        socket.emit("sendLocation", {
-          latitude,
-          longitude,
-        });
+        socket.emit(
+          "sendLocation",
+          {
+            latitude,
+            longitude,
+          },
+          () => {
+            console.log("location shared");
+          }
+        );
       });
     });
   });
