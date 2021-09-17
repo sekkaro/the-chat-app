@@ -2,19 +2,20 @@ import { render } from "mustache";
 import { Socket } from "socket.io-client";
 import { DefaultEventsMap } from "socket.io-client/build/typed-events";
 
-export const renderMessage = (
+export const renderLocation = (
   socket: Socket<DefaultEventsMap, DefaultEventsMap>,
   $messages: Element | null
 ) => {
-  const messageTemplate =
-    document?.querySelector("#message-template")!.innerHTML;
+  const locationTemplate =
+    document?.querySelector("#location-template")!.innerHTML;
 
-  socket.on("message", (message) => {
-    console.log(message);
+  socket.on("locationMessage", (url) => {
+    console.log(url);
 
-    const html = render(messageTemplate, {
-      message,
+    const html = render(locationTemplate, {
+      url,
     });
+
     $messages?.insertAdjacentHTML("beforeend", html);
   });
 };
