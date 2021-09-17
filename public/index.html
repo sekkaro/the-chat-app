@@ -9,10 +9,18 @@
   </head>
   <body>
     chat app
+
+    <div id="messages"></div>
+
     <form id="message-form">
       <input name="message" type="text" placeholder="Message" />
       <button>Send</button>
     </form>
     <button id="send-location">send location</button>
+    <script id="message-template" type="text/html">
+      <div>
+        <p>{{message}}</p>
+      </div>
+    </script>
   </body>
 </html>
