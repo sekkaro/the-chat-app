@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "webpack",
-    "web": "webpack --watch",
+    "web": "webpack --watch --mode development",
     "server": "tsc-watch --onSuccess \"node dist/index.js\"",
     "start": "node dist/index.js"
   },
