@@ -5,6 +5,7 @@ import { Server } from "socket.io";
 import Filter from "bad-words";
 
 import { Location } from "./types";
+import { generateLocationMessage, generateMessage } from "./utils/messages";
 
 const main = () => {
   const app = express();
@@ -16,8 +17,8 @@ const main = () => {
   io.on("connection", (socket) => {
     console.log("new web socket connection");
 
-    socket.emit("message", "Welcome!");
-    socket.broadcast.emit("message", "A new user has joined!");
+    socket.emit("message", generateMessage("Welcome!"));
+    socket.broadcast.emit("message", generateMessage("A new user has joined!"));
 
     socket.on("sendMessage", (message, callback) => {
       const filter = new Filter();
@@ -26,7 +27,7 @@ const main = () => {
         return callback("Profanity is not allowed");
       }
 
-      io.emit("message", message);
+      io.emit("message", generateMessage(message));
       callback();
     });
 
@@ -35,14 +36,16 @@ const main = () => {
 
       io.emit(
         "locationMessage",
-        `https://google.com/maps?q=${longitude},${latitude}`
+        generateLocationMessage(
+          `https://google.com/maps?q=${longitude},${latitude}`
+        )
       );
 
       callback();
     });
 
     socket.on("disconnect", () => {
-      io.emit("message", "A user has left");
+      io.emit("message", generateMessage("A user has left"));
     });
   });
 

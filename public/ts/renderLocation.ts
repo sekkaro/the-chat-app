@@ -1,6 +1,8 @@
 import { render } from "mustache";
 import { Socket } from "socket.io-client";
 import { DefaultEventsMap } from "socket.io-client/build/typed-events";
+import { LocationMessageType } from "../../src/types";
+import { formatTime } from "./utils/moment";
 
 export const renderLocation = (
   socket: Socket<DefaultEventsMap, DefaultEventsMap>,
@@ -9,11 +11,12 @@ export const renderLocation = (
   const locationTemplate =
     document?.querySelector("#location-template")!.innerHTML;
 
-  socket.on("locationMessage", (url) => {
-    console.log(url);
+  socket.on("locationMessage", (locationMessage: LocationMessageType) => {
+    console.log(locationMessage);
 
     const html = render(locationTemplate, {
-      url,
+      url: locationMessage.url,
+      createdAt: formatTime(locationMessage.createdAt),
     });
 
     $messages?.insertAdjacentHTML("beforeend", html);
