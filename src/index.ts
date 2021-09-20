@@ -17,8 +17,14 @@ const main = () => {
   io.on("connection", (socket) => {
     console.log("new web socket connection");
 
-    socket.emit("message", generateMessage("Welcome!"));
-    socket.broadcast.emit("message", generateMessage("A new user has joined!"));
+    socket.on("join", ({ username, room }) => {
+      socket.join(room);
+
+      socket.emit("message", generateMessage("Welcome!"));
+      socket.broadcast
+        .to(room)
+        .emit("message", generateMessage(`${username} has joined!`));
+    });
 
     socket.on("sendMessage", (message, callback) => {
       const filter = new Filter();
@@ -27,14 +33,14 @@ const main = () => {
         return callback("Profanity is not allowed");
       }
 
-      io.emit("message", generateMessage(message));
+      io.to("room").emit("message", generateMessage(message));
       callback();
     });
 
     socket.on("sendLocation", (location: Location, callback) => {
       const { longitude, latitude } = location;
 
-      io.emit(
+      io.to("room").emit(
         "locationMessage",
         generateLocationMessage(
           `https://google.com/maps?q=${longitude},${latitude}`
@@ -45,7 +51,7 @@ const main = () => {
     });
 
     socket.on("disconnect", () => {
-      io.emit("message", generateMessage("A user has left"));
+      io.to("room").emit("message", generateMessage(`${"username"} has left`));
     });
   });
 

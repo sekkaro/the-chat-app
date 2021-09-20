@@ -1,5 +1,6 @@
 import { io, Socket } from "socket.io-client";
 import { DefaultEventsMap } from "socket.io-client/build/typed-events";
+import qs from "qs";
 
 import { sendMessage } from "./sendMessage";
 import { sendLocation } from "./sendLocation";
@@ -22,6 +23,12 @@ const send = (socket: Socket<DefaultEventsMap, DefaultEventsMap>) => {
 
 const main = () => {
   const socket = io("/");
+
+  const { username, room } = qs.parse(location.search, {
+    ignoreQueryPrefix: true,
+  });
+
+  socket.emit("join", { username, room });
 
   window.addEventListener("load", () => {
     render(socket);
