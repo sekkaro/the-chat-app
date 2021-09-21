@@ -28,7 +28,12 @@ const main = () => {
     ignoreQueryPrefix: true,
   });
 
-  socket.emit("join", { username, room });
+  socket.emit("join", { username, room }, (error: string) => {
+    if (error) {
+      alert(error);
+      location.href = "/";
+    }
+  });
 
   window.addEventListener("load", () => {
     render(socket);

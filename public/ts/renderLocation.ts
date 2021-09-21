@@ -17,6 +17,7 @@ export const renderLocation = (
     const html = render(locationTemplate, {
       url: locationMessage.url,
       createdAt: formatTime(locationMessage.createdAt),
+      username: locationMessage.username,
     });
 
     $messages?.insertAdjacentHTML("beforeend", html);

@@ -6,6 +6,8 @@ import Filter from "bad-words";
 
 import { Location } from "./types";
 import { generateLocationMessage, generateMessage } from "./utils/messages";
+import { addUser, getUser, removeUser } from "./utils/users";
+import { User } from "./models";
 
 const main = () => {
   const app = express();
@@ -17,13 +19,23 @@ const main = () => {
   io.on("connection", (socket) => {
     console.log("new web socket connection");
 
-    socket.on("join", ({ username, room }) => {
-      socket.join(room);
+    socket.on("join", ({ username, room }, callback) => {
+      const { error, user } = addUser(new User(socket.id, username, room));
+      if (error) {
+        return callback(error);
+      }
 
-      socket.emit("message", generateMessage("Welcome!"));
+      socket.join(user!.room);
+
+      socket.emit("message", generateMessage("Welcome!", "Admin"));
       socket.broadcast
-        .to(room)
-        .emit("message", generateMessage(`${username} has joined!`));
+        .to(user!.room)
+        .emit(
+          "message",
+          generateMessage(`${user!.username} has joined!`, "Admin")
+        );
+
+      callback();
     });
 
     socket.on("sendMessage", (message, callback) => {
@@ -33,17 +45,36 @@ const main = () => {
         return callback("Profanity is not allowed");
       }
 
-      io.to("room").emit("message", generateMessage(message));
+      const user = getUser(socket.id);
+
+      if (!user) {
+        console.log("error has occured while sending message");
+        return;
+      }
+
+      const { room, username } = user;
+
+      io.to(room).emit("message", generateMessage(message, username));
       callback();
     });
 
     socket.on("sendLocation", (location: Location, callback) => {
       const { longitude, latitude } = location;
 
-      io.to("room").emit(
+      const user = getUser(socket.id);
+
+      if (!user) {
+        console.log("error has occured while sending location");
+        return;
+      }
+
+      const { room, username } = user;
+
+      io.to(room).emit(
         "locationMessage",
         generateLocationMessage(
-          `https://google.com/maps?q=${longitude},${latitude}`
+          `https://google.com/maps?q=${longitude},${latitude}`,
+          username
         )
       );
 
@@ -51,7 +82,19 @@ const main = () => {
     });
 
     socket.on("disconnect", () => {
-      io.to("room").emit("message", generateMessage(`${"username"} has left`));
+      const { error, user } = removeUser(socket.id);
+
+      if (error) {
+        console.log("error has occured while disconnecting");
+        return;
+      }
+
+      const { room, username } = user!;
+
+      io.to(room).emit(
+        "message",
+        generateMessage(`${username} has left`, "Admin")
+      );
     });
   });
 

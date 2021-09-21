@@ -18,6 +18,7 @@ export const renderMessage = (
     const html = render(messageTemplate, {
       message: message.text,
       createdAt: formatTime(message.createdAt),
+      username: message.username,
     });
     $messages?.insertAdjacentHTML("beforeend", html);
   });
