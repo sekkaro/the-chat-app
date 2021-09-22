@@ -6,19 +6,26 @@ import { sendMessage } from "./sendMessage";
 import { sendLocation } from "./sendLocation";
 import { renderMessage } from "./renderMessage";
 import { renderLocation } from "./renderLocation";
+import { renderSidebar } from "./renderSidebar";
 
-const render = (socket: Socket<DefaultEventsMap, DefaultEventsMap>) => {
-  const $messages = document?.querySelector("#messages");
-
+const render = (
+  socket: Socket<DefaultEventsMap, DefaultEventsMap>,
+  $messages: Element | null
+) => {
   renderMessage(socket, $messages);
 
   renderLocation(socket, $messages);
+
+  renderSidebar(socket);
 };
 
-const send = (socket: Socket<DefaultEventsMap, DefaultEventsMap>) => {
-  sendMessage(socket);
+const send = (
+  socket: Socket<DefaultEventsMap, DefaultEventsMap>,
+  $messages: Element | null
+) => {
+  sendMessage(socket, $messages);
 
-  sendLocation(socket);
+  sendLocation(socket, $messages);
 };
 
 const main = () => {
@@ -36,9 +43,10 @@ const main = () => {
   });
 
   window.addEventListener("load", () => {
-    render(socket);
+    const $messages = document?.querySelector("#messages");
+    render(socket, $messages);
 
-    send(socket);
+    send(socket, $messages);
   });
 };
 

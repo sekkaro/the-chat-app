@@ -3,6 +3,7 @@ import { Socket } from "socket.io-client";
 import { DefaultEventsMap } from "socket.io-client/build/typed-events";
 
 import { MessageType } from "../../src/types";
+import { autoScroll } from "./utils/autoScroll";
 import { formatTime } from "./utils/moment";
 
 export const renderMessage = (
@@ -21,5 +22,6 @@ export const renderMessage = (
       username: message.username,
     });
     $messages?.insertAdjacentHTML("beforeend", html);
+    autoScroll($messages);
   });
 };

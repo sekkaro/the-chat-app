@@ -25,3 +25,8 @@ export type UserReturn = {
   user?: UserType;
   error?: string;
 };
+
+export type RoomData = {
+  room: string;
+  users: UserType[];
+};

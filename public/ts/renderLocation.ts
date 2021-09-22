@@ -2,6 +2,7 @@ import { render } from "mustache";
 import { Socket } from "socket.io-client";
 import { DefaultEventsMap } from "socket.io-client/build/typed-events";
 import { LocationMessageType } from "../../src/types";
+import { autoScroll } from "./utils/autoScroll";
 import { formatTime } from "./utils/moment";
 
 export const renderLocation = (
@@ -21,5 +22,6 @@ export const renderLocation = (
     });
 
     $messages?.insertAdjacentHTML("beforeend", html);
+    autoScroll($messages);
   });
 };

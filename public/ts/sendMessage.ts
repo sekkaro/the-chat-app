@@ -2,7 +2,8 @@ import { Socket } from "socket.io-client";
 import { DefaultEventsMap } from "socket.io-client/build/typed-events";
 
 export const sendMessage = (
-  socket: Socket<DefaultEventsMap, DefaultEventsMap>
+  socket: Socket<DefaultEventsMap, DefaultEventsMap>,
+  $messages: Element | null
 ) => {
   const $messageForm = document.querySelector("#message-form");
   const $messageFormInput = $messageForm?.querySelector("input");
@@ -23,6 +24,7 @@ export const sendMessage = (
         return console.log(error);
       }
       console.log("the message was delivered");
+      $messages!.scrollTop = $messages!.scrollHeight;
     });
   });
 };

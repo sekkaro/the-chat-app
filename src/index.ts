@@ -6,7 +6,7 @@ import Filter from "bad-words";
 
 import { Location } from "./types";
 import { generateLocationMessage, generateMessage } from "./utils/messages";
-import { addUser, getUser, removeUser } from "./utils/users";
+import { addUser, getUser, getUsersInRoom, removeUser } from "./utils/users";
 import { User } from "./models";
 
 const main = () => {
@@ -20,6 +20,9 @@ const main = () => {
     console.log("new web socket connection");
 
     socket.on("join", ({ username, room }, callback) => {
+      if (!username || !room) {
+        return callback("username or room is undefined");
+      }
       const { error, user } = addUser(new User(socket.id, username, room));
       if (error) {
         return callback(error);
@@ -34,6 +37,10 @@ const main = () => {
           "message",
           generateMessage(`${user!.username} has joined!`, "Admin")
         );
+      io.to(user!.room).emit("roomData", {
+        room: user!.room,
+        users: getUsersInRoom(user!.room),
+      });
 
       callback();
     });
@@ -95,6 +102,11 @@ const main = () => {
         "message",
         generateMessage(`${username} has left`, "Admin")
       );
+
+      io.to(room).emit("roomData", {
+        room: room,
+        users: getUsersInRoom(room),
+      });
     });
   });
 
